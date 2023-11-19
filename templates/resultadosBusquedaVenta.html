@@ -1,0 +1,41 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesTables.css') }}">
+{% block content %}
+<div class="table-responsive">
+    <table class="table table-striped content-table">
+        <thead class="content-head">
+            <tr>
+                <th>No. Venta</th>
+                <th>Fecha creación</th>
+                <th>Cliente</th>
+                <th>Vendedor</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody class="">
+            {% for venta in ventas %}
+            <tr>
+                <td class="multiple-content-cell">
+                    <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[0] }}</a>
+                </td>
+                <td class="multiple-content-cell">
+                    <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[1] }}</a>
+                </td>
+                <td class="multiple-content-cell">
+                    <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[2] }}</a>
+                </td>
+                <td class="multiple-content-cell">
+                    <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[3] }}</a>
+                </td>
+                <td class="multiple-content-cell cell-delete">
+                    <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[4] }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="pagination">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+{% endblock %}

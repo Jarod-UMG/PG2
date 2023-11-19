@@ -1,0 +1,84 @@
+/* styles.css */
+.container {
+    margin-top: 20px;
+    border: 1px solid crimson;
+}
+
+.btn {
+    margin-right: 10 px;
+}
+
+.usuarios-table th,
+.usuarios-table td {
+    text-align: center; /* Centrar el texto en celdas */
+}
+
+.usuarios-table{
+    background-color: white;
+}
+
+.usuarios-table tbody tr:hover {
+    background-color: #F5FEFE; /* Cambia el color de fondo al pasar el mouse sobre las filas */
+    cursor: pointer; /* Cambia el cursor a una mano para indicar que es interactivo */
+}
+
+.usuarios-table td {
+    word-break: break-word;
+    max-width: 100px; /* Ajusta según tus necesidades */
+    white-space: nowrap; /* Evita el salto de línea en las celdas */
+    overflow: hidden; /* Evita que el contenido sobresalga */
+    text-overflow: ellipsis; /* Agrega puntos suspensivos si el contenido es muy largo */
+}
+
+.fa-eye-slash::before {
+    content: "\f070"; /* Código Unicode para el ícono de línea diagonal */
+}
+
+/* Estilo para la paginación de Bootstrap 4 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+.page-item {
+    margin: 0 5px;
+}
+
+.page-link {
+    color: #007bff; /* Color del enlace de la página */
+    background-color: transparent;
+    border: 1px solid #dee2e6; /* Borde del enlace de la página */
+    border-radius: 4px;
+}
+
+.page-link:hover {
+    background-color: #f8f9fa; /* Color de fondo cuando se pasa el mouse */
+}
+
+.page-item.active .page-link {
+    background-color: #007bff; /* Color de fondo del enlace de la página activa */
+    border-color: #007bff; /* Color del borde del enlace de la página activa */
+    color: #fff; /* Color del texto del enlace de la página activa */
+}
+/*estilos de la barra de busqueda*/
+.custom-form {
+    background-color: #f0f0f0; /* Cambia el color de fondo del formulario */
+    border: 1px solid #ccc; /* Agrega un borde al formulario */
+    padding: 10px; /* Añade espaciado interno */
+    border-radius: 5px; /* Redondea los bordes */
+}
+
+/* Estilo para el botón */
+.btn-primary {
+    background-color: #007bff; /* Cambia el color de fondo del botón */
+    border-color: #007bff; /* Cambia el color del borde del botón */
+    color: #fff; /* Cambia el color del texto del botón */
+}
+
+/* Estilo para el botón al pasar el ratón por encima */
+.btn-primary:hover {
+    background-color: #0056b3; /* Cambia el color de fondo al pasar el ratón por encima */
+    border-color: #0056b3; /* Cambia el color del borde al pasar el ratón por encima */
+}

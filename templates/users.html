@@ -1,0 +1,152 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2> <br> Gestión de Usuarios</h2>
+    <a href="#" class="btn btn-success" data-toggle="modal" data-target="#nuevoUsuarioModal">Nuevo Usuario</a>
+    <br><br>
+    <div class="table-responsive">
+        
+        {% if 'mensaje' in session %}
+        <div id="mensaje-exito" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session.pop('mensaje') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %}
+        
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-{{ messages[0] }}" role="alert">
+            {{ messages[1] }}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Formulario de búsqueda -->
+        <form action="{{ url_for('buscar_usuarios') }}" method="POST" class="form-inline">
+            <div class="form-group">
+                <label for="campo_busqueda">Selecciona el campo de búsqueda:</label>
+                <select class="form-control custom-select mx-2" id="campo_busqueda" name="campo_busqueda">
+                    <option value="nombre">Nombre</option>
+                    <option value="correo">Correo Electrónico</option>
+                </select>
+            
+                <label for="valor_busqueda" class="mx-2">Valor de Búsqueda:</label>
+                <input type="text" class="form-control mx-2" id="valor_busqueda" name="valor_busqueda" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-primary btn-sm d-inline ml-2">Buscar</button>
+            </div>
+        </form><br>
+        
+        <!-- Tabla -->
+        <table class="table table-bordered usuarios-table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo Electrónico</th>
+                    <th>Contraseña</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="">
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario[1] }}</td>
+                    <td>{{ usuario[2] }}</td>
+                    <td>
+                        <span class="password">{{ '•' * 8 }}</span>
+                        <i class="fas fa-eye show-password"></i>
+                    </td>                   
+                    <td>{{ usuario[4] }}</td>
+                    <td >
+                        <div  class="button-container text-center" >                                                                                                      
+                            <form action="{{ url_for('eliminar_usuario', ID_USUARIO=usuario[0]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">                                                                                    
+                                <!-- Botón Modificar -->
+                                <a href="{{ url_for('editUsers', ID_USUARIO=usuario[0]) }}" class="btn btn-info btn-sm">
+                                    <img src="{{ url_for('static', filename='img/edit.png') }}" alt="Editar" width="25" height="25">
+                                </a>                                                                                    
+                                <!-- Botón Eliminar -->                            
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-danger btn-sm" >
+                                    <img src="{{ url_for('static', filename='img/delete_card.png') }}" alt="Eliminar" width="25" height="25">
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Mostrar los botones de paginación -->
+<div class="pagination">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+
+<!-- Aquí empieza Modal para crear usuario -->
+<div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" role="dialog" aria-labelledby="nuevoUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="nuevoUsuarioModalLabel">
+                    <i class="fas fa-user-plus mr-2"></i> Nuevo Usuario
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('crear_usuario') }}" method="POST">
+                    
+                    <div class="form-group">
+                        <label for="nombre"><i class="fas fa-user"></i> Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="correo"><i class="fas fa-envelope"></i> Correo Electrónico:</label>
+                        <input type="email" class="form-control" id="correo" name="correo" required>
+                        <small id="correo-error" class="form-text text-danger"></small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contrasena"><i class="fas fa-lock"></i> Contraseña:</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                            <div class="input-group-append">
+                                <span class="input-group-text bg-transparent border-0 toggle-password">
+                                    <i class="fas fa-eye-slash show-password-icon" style="cursor: pointer;"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rol"><i class="fas fa-user-tag"></i> Rol:</label>
+                        <select class="form-control" id="id_rol" name="id_rol" required>
+                            {% for rol in roles %}
+                            <option value="{{ rol[0] }}">{{ rol[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" >
+                    <i class="fas fa-check"></i> Guardar
+                </button>
+            </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Aquí termina la ventana modal-->
+
+{% endblock %}

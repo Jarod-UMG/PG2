@@ -1,0 +1,30 @@
+Dirigirse la carpeta con el comando cd
+git init
+git status -s
+git add .
+git status -s
+git config user.email "wilalexis76@gmail.com"
+git commit -m "primer commit"
+
+
+-----Esto varia por le repositorio
+git remote add origin https://github.com/Wilalexis/Tarea_nodejs.git
+git branch -M main
+git push -u origin main
+
+
+-----Para actualizar los cambios realizados
+git status -s
+git add .
+git commit -m "segundo comentario"
+git push -u origin main
+
+git status -s
+git add .
+git config user.email "wilalexis76@gmail.com
+git commit -m "segundo comentario"
+git push -u origin main
+
+-----Actualizar repositorio
+git pull origin main
+

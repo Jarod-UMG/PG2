@@ -1,0 +1,25 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesTables.css') }}">
+{% block content %}
+<div class="table-responsive">
+    <table class="table table-bordered content-table">
+        <thead class="content-head">
+            <tr>
+                <th>Marca</th>
+            </tr>
+        </thead>
+        <tbody class="">
+            {% for marca in marcas %}
+            <tr>
+                <td class="content-cell">
+                    <a href="{{ url_for('editBrands', ID_MARCA=marca[0]) }}" class="content-btn">{{ marca[1] }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="pagination">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+<style>
+    .hide-name {
+        position: relative;
+        visibility: hidden;
+    }
+
+    .hide-name::after {
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        font-weight: bold;
+        content: "Contactos";
+        position: absolute;
+        visibility: visible;
+        left: 10%;
+        top: -5px;
+    }
+
+    /* .hide-inv {
+        position: relative;
+        visibility: visible;
+    } */
+
+    .hide-arrow {
+        position: relative;
+        visibility: visible;
+        left: 15px;
+        top: -5px;
+    }
+</style>
+
+<a href="{{ url_for('contacts') }}" class="edit-back">Contactos </a><a
+    style="font-size: 25px; user-select: none; color: lightgrey;">/ [{{ contacto[0] }}] {{ contacto[1] }}</a>
+
+<div class="edit-main-container">
+    <div class="edit-btn-group">
+        <button type="submit" class="edit-save btn btn-success" id="guardar-btn">
+            Guardar
+        </button>
+    </div>
+    <form class="edit-form" action="{{ url_for('editContacts', ID_CONTACTO=contacto[0]) }}" method="POST"
+        enctype="multipart/form-data">
+
+        <div class="edit-section1">
+            <div class="group-section1 input-group">
+                <label for="nombre_contacto">Nombre:</label>
+                <input type="text" class="form-control" id="nombre_contacto" name="nombre_contacto"
+                    value="{{ contacto[1] }}" required>
+            </div>
+
+            <div class="group-section1 input-group">
+                <div class="group-section1-1">
+                    <label for="imagen_contacto">Imagen:</label>
+                    <input type="file" class="form-control" id="imagen" name="imagen_contacto">
+                </div>
+                <img id="preview" src="{{ url_for('static', filename=contacto[7]) }}" alt="No_imagen" class="form-img">
+            </div>
+        </div>
+
+        <div class="edit-section2">
+
+            <div class="input-group">
+                <label for="correo_contacto">Correo:</label>
+                <input type="email" class="form-control" id="correo_contacto" name="correo_contacto"
+                    value="{{ contacto[2] }}">
+            </div>
+
+            <div class="input-group">
+                <label for="direccion_contacto">Dirección:</label>
+                <input type="text" class="form-control" id="direccion_contacto" name="direccion_contacto"
+                    value="{{ contacto[3] }}" required>
+            </div>
+
+            <div class="input-group">
+                <label for="telefono_contacto">Telefono:</label>
+                <input type="text" class="form-control" id="telefono_contacto" name="telefono_contacto"
+                    value="{{ contacto[4] }}">
+            </div>
+
+            <div class="input-group">
+                <label for="nit_contacto">Nit:</label>
+                <input type="text" class="form-control" id="nit_contacto" name="nit_contacto" value="{{ contacto[5] }}"
+                    required>
+            </div>
+
+            <div class="input-group">
+                <label for="categoria">Rol:</label>
+                <select class="form-control" id="id_rol" name="id_rol" required>
+                    {% for rolescontacto in rolescontactos %}
+                    <option value="{{ rolescontacto[0] }}" {% if rolescontacto[0]==contacto[6] %} selected {% endif %}>
+                        {{ rolescontacto[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="edit-section3"></div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#guardar-btn").click(function () {
+            // Recolectar los datos del formulario
+            var formData = new FormData($(".edit-form")[0]);
+
+            // Realizar una solicitud AJAX para enviar los datos al servidor
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('editContacts', ID_CONTACTO=contacto[0]) }}",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    // Manejar la respuesta del servidor (puede ser redirigir o mostrar un mensaje de éxito)
+                    alert("Los cambios se han guardado correctamente.");
+                    window.location.reload();
+                },
+                error: function (error) {
+                    // Manejar los errores si la solicitud falla
+                    alert("Ha ocurrido un error al guardar los cambios.");
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

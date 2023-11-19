@@ -1,0 +1,147 @@
+/* HEADER */
+.page-header {
+    max-width: 100%;
+    height: 150px;
+    margin: 2px;
+    user-select: none;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: repeat(2, 80px);
+    /* border: 1px solid lightgreen; */
+}
+
+.page-header .page-name-module {
+    max-width: auto;
+    max-height: auto;
+    margin: 2px;
+    font-family: Arial;
+    font-size: 2.5rem;
+    color: gray;
+    /* border: 1px solid brown; */
+}
+
+.page-header .pages-form {
+    max-width: auto;
+    max-height: auto;
+    margin: 2px;
+    display: flex;
+    flex-flow: column nowrap;
+    /* border: 1px solid brown; */
+}
+
+.page-header .pages-form .page-search {
+    width: 90%;
+    height: 40px;
+    border: 1px solid transparent;
+    border-bottom: 1px solid gray;
+}
+
+.page-header .pages-form .page-search:focus {
+    outline: none;
+}
+
+.page-header .pages-form .page-search-btn {
+    width: 5%;
+    height: 40px;
+    border: 1px solid transparent;
+    border-bottom: 1px solid gray;
+}
+
+.page-header .pages-form .page-search-btn:focus {
+    outline: none;
+}
+
+.page-header .pages-form .page-select {
+    width: 10%;
+    max-width: 200px;
+    height: 40px;
+    border: 1px solid gray;
+}
+
+.page-header .pages-form .page-select:focus {
+    outline: none;
+    border: 1px solid transparent;
+}
+
+.select-group {
+    width: 100%;
+    margin: 4px;
+}
+
+.search-group {
+    margin: 4px;
+}
+
+.page-header .page-create-btn {
+    width: 15%;
+    max-height: 50%;
+    margin: 10px;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/* PAGNINACION */
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+.page-item {
+    margin: 0 5px;
+}
+
+.page-link {
+    color: #007bff;
+    /* Color del enlace de la página */
+    background-color: transparent;
+    border: 1px solid #dee2e6;
+    /* Borde del enlace de la página */
+    border-radius: 4px;
+}
+
+.page-link:hover {
+    background-color: #f8f9fa;
+    /* Color de fondo cuando se pasa el mouse */
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    /* Color de fondo del enlace de la página activa */
+    border-color: #007bff;
+    /* Color del borde del enlace de la página activa */
+    color: #fff;
+    /* Color del texto del enlace de la página activa */
+}
+
+/*estilos de la barra de busqueda*/
+.custom-form {
+    background-color: #f0f0f0;
+    /* Cambia el color de fondo del formulario */
+    border: 1px solid #ccc;
+    /* Agrega un borde al formulario */
+    padding: 10px;
+    /* Añade espaciado interno */
+    border-radius: 5px;
+    /* Redondea los bordes */
+}
+
+/* Estilo para el botón */
+.btn-primary {
+    background-color: #007bff;
+    /* Cambia el color de fondo del botón */
+    border-color: #007bff;
+    /* Cambia el color del borde del botón */
+    color: #fff;
+    /* Cambia el color del texto del botón */
+}
+
+/* Estilo para el botón al pasar el ratón por encima */
+.btn-primary:hover {
+    background-color: #0056b3;
+    /* Cambia el color de fondo al pasar el ratón por encima */
+    border-color: #0056b3;
+    /* Cambia el color del borde al pasar el ratón por encima */
+}

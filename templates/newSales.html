@@ -1,0 +1,326 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+
+<style>
+    .hide-name {
+        position: relative;
+        visibility: hidden;
+    }
+
+    .hide-name::after {
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        font-weight: bold;
+        content: "Ventas";
+        position: absolute;
+        visibility: visible;
+        left: 10%;
+        top: -5px;
+    }
+
+    /* .hide-inv {
+        position: relative;
+        visibility: visible;
+    } */
+
+    .hide-arrow {
+        position: relative;
+        visibility: visible;
+        left: 15px;
+        top: -5px;
+    }
+
+    .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            width: 210px;
+            min-height: auto;
+            max-height: 210px;
+            overflow: hidden;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            
+        }
+</style>
+
+<a href="{{ url_for('sales') }}" class="edit-back">Ventas </a><a
+    style="font-size: 25px; user-select: none; color: lightgrey;">/ Nuevo</a>
+
+<div class="edit-main-container">
+    <div class="edit-btn-group">
+        <button type="submit" class="edit-save btn btn-success" id="guardar-btn">
+            Guardar
+        </button>
+    </div>
+    <form class="edit-form" action="{{ url_for('crear_venta')}}" method="POST">
+
+        <div class="edit-section1">
+            <div class="group-section1 input-group">
+                <input type="text" class="form-control" placeholder="" value="Nuevo" disabled>
+            </div>
+        </div>
+
+        <div class="edit-section2">
+            <div class="input-group">
+                <label for="nombre">Cliente:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                <div class="dropdown" onmouseleave="hideDropdown()">
+                    <input type="text" id="searchInput" onkeyup="filterDropdown()" onclick="showDropdown()" onblur="hideDropdown()" placeholder="Buscar cliente" required>
+                    <div class="dropdown-content" id="myDropdown">
+                        {% for producto in productos %}
+                        <a onclick="selectResult(this)" value="{{ producto[0] }}" data-precio="{{ producto[5] }}" data-max="{{ producto[6] }}">{{
+                            producto[1] }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="nit">Nit:</label>
+                <input type="text" class="form-control" id="nit" name="nit" pattern="[0-9]{10}"
+                    title="El nit debe ser de exactamente 10 dígitos" required>
+            </div>
+
+            <div class="input-group">
+                <label for="direccion">Direccion:</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" required>
+            </div>
+
+            <div class="input-group">
+                <label for="fecha_emision">Fecha de venta:</label>
+                <input type="text" class="form-control" id="fecha_emision" name="fecha_emision" required disabled>
+            </div>
+
+            <div class="input-group">
+                <select class="form-control" name="producto_id" id="producto_id" required>
+                    <option value="" disabled selected>Seleccione un producto</option>
+                    {% for producto in productos %}
+                    <option value="{{ producto[0] }}" data-precio="{{ producto[5] }}" data-max="{{ producto[6] }}">{{
+                        producto[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <button id="agregar_producto" name="agregar_producto" class="edit-save btn btn-success"><i
+                        class="fas fa-plus" style="color: white;"></i></button>
+
+            </div>
+
+        </div>
+
+        <div class="edit-section3">
+            <div class="container-sales">
+                <div class="table-responsive">
+                    <table class="table table-striped content-table-sales" id="detalle_factura">
+                        <thead class="content-head">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detalle_factura_body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p style="position: relative; left: 65%;">Total: <span id="total">Q0.00</span></p>
+        </div>
+    </form>
+</div>
+
+<script>
+            function filterDropdown() {
+            var input, filter, ul, li, a, i;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            ul = document.getElementById("myDropdown");
+            li = ul.getElementsByTagName("a");
+            for (i = 0; i < li.length; i++) {
+                a = li[i];
+                if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    li[i].style.display = "";
+                } else {
+                    li[i].style.display = "none";
+                }
+            }
+        }
+
+        function showDropdown() {
+            document.getElementById("myDropdown").style.display = "block";
+        }
+
+        function hideDropdown() {
+            setTimeout(function() {
+                document.getElementById("myDropdown").style.display = "none";
+            }, 200); // Retraso para asegurar que no se cierre antes de hacer clic en el dropdown
+        }
+
+        function selectResult(element) {
+            document.getElementById("searchInput").value = element.innerHTML;
+            hideDropdown();
+        }
+
+    // const fechaactual = new Date().toISOString().split('T')[0];
+    const fechaactual = new Date().toLocaleDateString();
+    document.getElementById('fecha_emision').value = fechaactual;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectProducto = document.getElementById("producto_id");
+        const detalleFacturaBody = document.getElementById("detalle_factura_body");
+        const agregarProductoButton = document.getElementById("agregar_producto");
+        const guardarFacturaButton = document.getElementById("guardar-btn");
+        const facturaItems = []; // Array para almacenar los productos
+
+        agregarProductoButton.addEventListener("click", function () {
+            const selectedOption = selectProducto.options[selectProducto.selectedIndex];
+            if (selectedOption.value) {
+                const productoId = selectedOption.value;
+                const productoNombre = selectedOption.textContent;
+                const cantidad = 1; // Establece 1 como valor predeterminado
+                const precio = parseFloat(selectedOption.getAttribute("data-precio"));
+                const max = parseFloat(selectedOption.getAttribute("data-max"));
+                const subtotal = cantidad * precio;
+
+                // Crea un objeto para el producto y agrégalo al array facturaItems
+                const producto = {
+                    id_producto: productoId,
+                    precio: precio,
+                    cantidad: cantidad,
+                    subtotal: subtotal
+                };
+                facturaItems.push(producto);
+
+                // Crea una nueva fila en la tabla de detalles de factura
+                const newRow = detalleFacturaBody.insertRow();
+                newRow.innerHTML = `
+            <input type="hidden" value="${productoId}" name="id_producto" id="id_producto">
+            <td class="multiple-content-cell"><a>${productoNombre}</a></td>
+            <td class="multiple-content-cell"><input type="number" value="${cantidad}" min="1" max="${max}" name="cantidad" class="cantidad"></td>
+            <td class="multiple-content-cell"><a name="precio">Q${precio}</a></td>
+            <td class="multiple-content-cell"><a name="subtotal">Q${subtotal}</a></td>
+            <td class="multiple-content-cell"><button class="eliminar-producto edit-save btn btn-danger"><i class="fas fa-minus" style="color: white;"></i></button></td>
+        `;
+
+                // Limpia la selección en el select
+                selectProducto.value = "";
+
+                // Agrega un evento de cambio al campo de cantidad recién creado
+                const cantidadInput = newRow.querySelector(".cantidad");
+                cantidadInput.addEventListener("change", function () {
+                    const newCantidad = parseInt(cantidadInput.value);
+                    // Encuentra el índice del producto en facturaItems
+                    const index = facturaItems.findIndex(item => item.id_producto === productoId);
+                    if (index !== -1) {
+                        facturaItems[index].cantidad = newCantidad;
+                        facturaItems[index].subtotal = newCantidad * precio;
+                        Subtotal();
+                        updateTotal();
+                    }
+                });
+
+                cantidadInput.addEventListener('input', Subtotal);
+
+                function Subtotal() {
+                    const newCantidad = parseInt(cantidadInput.value);
+                    const index = facturaItems.findIndex(item => item.id_producto === productoId);
+                    if (index !== -1) {
+                        facturaItems[index].cantidad = newCantidad;
+                        facturaItems[index].subtotal = newCantidad * precio;
+                        const celda = newRow.querySelector('[name="subtotal"]');
+                        const subtotal = facturaItems[index].subtotal;
+                        celda.innerHTML = `Q${subtotal}`;
+                    }
+                }
+
+                function updateTotal() {
+                    let total = 0;
+                    facturaItems.forEach(function (item) {
+                        total += item.subtotal;
+                    });
+
+                    const totalElement = document.getElementById('total');
+                    totalElement.textContent = `Q${total.toFixed(2)}`;
+                }
+
+                // Your existing code ...
+
+                // Call the updateTotal function initially
+                updateTotal();
+            }
+
+            const eliminarBotones = document.querySelectorAll(".eliminar-producto");
+            eliminarBotones.forEach(function (boton) {
+                boton.addEventListener("click", function () {
+                    // Encuentra la fila que contiene el botón de eliminación y elimínala
+                    const fila = boton.closest("tr");
+                    fila.remove();
+                    // Elimina el producto correspondiente de facturaItems
+                    const productoId = fila.querySelector("input[name='id_producto']").value;
+                    const index = facturaItems.findIndex(item => item.id_producto === productoId);
+                    if (index !== -1) {
+                        facturaItems.splice(index, 1);
+                        updateTotal();
+                    }
+                });
+            });
+        });
+
+
+        guardarFacturaButton.addEventListener("click", function () {
+            var nombre = $("#nombre").val().trim();
+            var nit = $("#nit").val().trim();
+            var direccion = $("#direccion").val().trim();
+            var fecha_emision = $("#fecha_emision").val().trim();
+
+            if (nombre === "" || nit === "" || direccion === "" || fecha_emision === "") {
+                alert("Por favor complete todos los campos obligatorios.");
+                return;
+            }
+
+            var dataToSend = {
+                facturaItems: facturaItems,
+                nombre: nombre,
+                nit: nit,
+                direccion: direccion,
+                fecha_emision: fecha_emision
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('crear_venta') }}",
+                data: JSON.stringify(dataToSend),
+                processData: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    // alert("Los cambios se han guardado correctamente.");
+                    window.location.replace("/admin/sales");
+                },
+                error: function (error) {
+                    alert("Verifique que los datos de los campos sean del tipo correcto y vuelva a intentar.")
+                }
+            });
+        });
+    });
+
+
+</script>
+
+{% endblock %}

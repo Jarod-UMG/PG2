@@ -1,0 +1,113 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+<style>
+    .hide-name {
+        position: relative;
+        visibility: hidden;
+    }
+
+    .hide-name::after {
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        content: "Ventas";
+        position: absolute;
+        visibility: visible;
+        left: 10%;
+        top: -5px;
+    }
+
+    /* .hide-inv {
+        position: relative;
+        visibility: visible;
+    } */
+
+    .hide-arrow {
+        position: relative;
+        visibility: visible;
+        left: 15px;
+        top: -5px;
+    }
+</style>
+
+<div class="page-header">
+    <p class="page-name-module">Ventas</p>
+
+    <form id="form-busqueda" class="pages-form">
+        <div class="search-group input-group">
+            <input type="text" class="page-search" id="valor_busqueda" name="valor_busqueda" placeholder="Buscar"
+                autocomplete="off">
+            <button type="button" id="buscar" class="page-search-btn"><i class="fas fa fa-search"></i></button>
+        </div>
+        <div class="select-group">
+            <select class="page-select" id="campo_busqueda" name="campo_busqueda">
+                <option value="nada" selected>Filtros</option>
+                <option class="opt" value="nombre">Nombre</option>
+                <option class="opt" value="no_factura">No. Venta</option>
+            </select>
+        </div>
+    </form>
+
+    <a href="{{ url_for('newSales') }}" class="btn btn-success page-create-btn">Crear</a>
+</div>
+
+<div class="content-container" id="resultado-busqueda">
+    <div class="table-responsive">        
+         <table class="table table-striped content-table">
+            <thead class="content-head">
+                <tr>
+                    <th>No. Venta</th>
+                    <th>Fecha creación</th>
+                    <th>Cliente</th>
+                    <th>Vendedor</th>
+                    <!-- <th>Total</th> -->
+                </tr>
+            </thead> 
+            <tbody class="">
+                {% for venta in ventas %}
+                <tr>
+                    <td class="multiple-content-cell">
+                        <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[0] }}</a>
+                    </td>
+                    <td class="multiple-content-cell">
+                        <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[1] }}</a>
+                    </td>
+                    <td class="multiple-content-cell">
+                        <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[2] }}</a>
+                    </td>
+                    <td class="multiple-content-cell">
+                        <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">{{ venta[5] }}</a>
+                    </td>
+                    <!-- <td class="multiple-content-cell cell-delete">
+                        <a href="{{ url_for('editSales', NO_FACTURA=venta[0]) }}" class="content-btn">Q {{ venta[6] }}</a>
+                    </td>            -->
+                </tr>
+                {% endfor %}
+            </tbody>      
+         </table>    
+    </div>
+    <div class="pagination">
+        {{ pagination.info }}
+        {{ pagination.links }}
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $("#buscar").click(function () {
+            var formData = $("#form-busqueda").serialize();
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('buscar_ventas') }}",
+                data: formData,
+                success: function (response) {
+                    $("#resultado-busqueda").html(response);
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

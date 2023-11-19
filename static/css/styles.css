@@ -1,0 +1,14 @@
+.navbar {
+    background-color: whitesmoke !important;
+}
+
+.navbar .navbar-brand {
+    color: #000000;
+    font-family: Arial;
+    font-weight: bold;
+}
+
+.navbar a .nav-link {
+    color: rgb(255, 255, 255);
+}
+

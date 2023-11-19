@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesProducts.css') }}">
+{% block content %}
+<div class="product-main-container">
+    {% for producto in productos %}
+    <a class="product-container" href="{{ url_for('editProducts', ID_PRODUCTO=producto[0]) }}">
+        <div class="product-img-container"><img src="{{ url_for('static', filename=producto[7]) }}" alt="imagen"
+                class="product-img"></div>
+        <div class="product-info-container">
+            <p class="product-name">{{ producto[1] }}</p>
+            <p class="product-price">Precio: Q.{{ producto[5] }}</p>
+            <p class="product-stock">En existencia: {{ producto[6] }}</p>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<div class="pagination">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+{% endblock %}

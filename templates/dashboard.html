@@ -1,0 +1,50 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+<div class="main-container">
+    <div class="module-container">
+        <div class="module-content">
+            <p class="module-name">Inventarios</p>
+            <a href="{{ url_for('products') }}" class="btn-dashboard module-btn" style="background-color: chocolate;">
+                <img src="/static/img/inventario.png" alt="Usuarios" class="module-img">
+            </a>
+        </div>
+    </div>
+
+    <div class="module-container">
+        <div class="module-content">
+            <p class="module-name">Ventas</p>
+            <a href="{{ url_for('sales') }}" class="btn-dashboard module-btn" style="background-color: orange;">
+                <img src="/static/img/Ventas.png" alt="Usuarios" class="module-img">
+            </a>
+        </div>
+    </div>
+
+    <div class="module-container">
+        <div class="module-content">
+            <p class="module-name">Compras</p>
+            <a href="{{ url_for('purchases') }}" class="btn-dashboard module-btn" style="background-color: greenyellow;">
+                <img src="/static/img/Compras.png" alt="Usuarios" class="module-img">
+            </a>
+        </div>
+    </div>
+
+    <div class="module-container">
+        <div class="module-content">
+            <p class="module-name">Contactos</p>
+            <a href="{{ url_for('contacts') }}" class="btn-dashboard module-btn" style="background-color: cyan;">
+                <img src="/static/img/Contactos.png" alt="Usuarios" class="module-img">
+            </a>
+        </div>
+    </div>
+
+    <div class="module-container">
+        <div class="module-content">
+            <p class="module-name">Facturas</p>
+            <a href="#" class="btn-dashboard module-btn" style="background-color: cornflowerblue;">
+                <img src="/static/img/Facturas.png" alt="Usuarios" class="module-img">
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

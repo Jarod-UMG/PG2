@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesTables.css') }}">
+{% block content %}
+<div class="table-responsive">
+    <table class="table table-striped content-table">
+        <thead class="content-head">
+            <tr>
+                <th>Categoria</th>
+            </tr>
+        </thead>
+        <tbody class="">
+            {% for categoria in categorias %}
+            <tr>
+                <td class="content-cell">
+                    <a href="{{ url_for('editCategories', ID_CATEGORIA=categoria[0]) }}" class="content-btn">{{
+                        categoria[1] }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+{% endblock %}

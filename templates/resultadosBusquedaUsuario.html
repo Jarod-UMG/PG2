@@ -1,0 +1,50 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Resultados de la Búsqueda</h2>
+
+    <!-- Agregar un enlace para volver a la página de usuarios si es necesario -->
+    <a href="{{ url_for('users') }}" class="btn btn-success">Volver a Usuarios</a><br><br>
+
+    <table class="table table-bordered table-striped table-hover usuarios-table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Correo Electrónico</th>
+                <th>Contraseña</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario[1] }}</td>
+                <td>{{ usuario[2] }}</td>
+                <td>
+                    <span class="password">{{ '•' * 8 }}</span>
+                    <i class="fas fa-eye show-password"></i>
+                </td>                   
+                <td>{{ usuario[4] }}</td>
+                <td>
+                    <div  class="button-container text-center" >
+                        <form action="{{ url_for('eliminar_usuario', ID_USUARIO=usuario[0]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">                                                                                    
+                            <!-- Botón Modificar -->
+                            <a href="{{ url_for('editUsers', ID_USUARIO=usuario[0]) }}" class="btn btn-info btn-sm">
+                                <img src="{{ url_for('static', filename='img/edit.png') }}" alt="Editar" width="25" height="25">
+                            </a>                                                                                    
+                            <!-- Botón Eliminar -->                            
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger btn-sm" >
+                                <img src="{{ url_for('static', filename='img/delete_card.png') }}" alt="Eliminar" width="25" height="25">
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

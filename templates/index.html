@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="index-container">
+    <div class="saludo-container">
+        <h1 id="saludo"></h1>
+    </div>
+</div>
+<div class="container login-container">
+    <div class="login-box">
+        <div class="login-logo">
+            <img src="{{ url_for('static', filename='img/key.png') }}" alt="Logo de la Tienda">
+        </div>
+        <h2 class="login-title">Bienvenido de nuevo</h2>
+        <form>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Correo electrónico" required>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="Contraseña" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

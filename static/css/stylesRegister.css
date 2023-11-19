@@ -1,0 +1,94 @@
+.registration-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 83vh;
+    background-color: #E8F7EA;
+    width: 65% !important;
+    margin: 0 auto;
+}
+
+.registration-box {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    width: 550px;
+    text-align: center;
+}
+
+.registration-logo img {
+    max-width: 120px;
+    margin-bottom: 20px;
+}
+
+.registration-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center; /* Centra verticalmente los elementos en el formulario */
+    margin-bottom: 20px;
+}
+
+/* Estilo para la clase "align-left" para que los cuadros de mostrar contraseña esten del lado izquierdo*/
+.align-left {
+    justify-content: flex-start; /* Alinea horizontalmente los elementos a la izquierda */
+    text-align: left; /* Alinea el texto a la izquierda */
+    margin-bottom: 10px; /* Añade un margen inferior para separar del contenido superior */
+}
+
+.form-control {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 16px;
+    flex: 1; /* El campo de contraseña ocupará todo el espacio disponible */
+}
+
+.mostrar-contrasena {
+    margin-left: 10px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.login-link {
+    margin-top: 20px;
+    color: #555;
+    font-size: 16px;
+}
+
+.login-link a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+/* Estilo para mensajes de éxito */
+.success {
+    color: green; /* Texto verde */
+}
+
+/* Estilo para mensajes de error */
+.error {
+    color: red; /* Texto rojo */
+}

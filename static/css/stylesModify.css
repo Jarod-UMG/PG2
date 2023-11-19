@@ -1,0 +1,152 @@
+.edit-back {
+    font-size: 25px;
+    color: green;
+    text-decoration: none;
+    margin: 15px 0px 15px 15px;
+}
+
+.edit-back:hover {
+    color: green;
+}
+
+.edit-main-container {
+    max-width: 100%;
+    min-height: 100%;
+    margin: 15px 15px -15px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid crimson; */
+}
+
+.container-sales-edit {
+    max-width: 100%;
+    height: 210px;
+    margin: 0px 15px 15px 15px;
+    padding: 0px 15px 15px 15px;
+    user-select: none;
+    overflow: hidden scroll;
+    border: 1px solid lightgray;
+    border-top: 0px solid transparent !important;
+}
+
+input[type="text"] {
+    border: 1px solid transparent;
+    border-bottom: 1px solid black;
+}
+
+.edit-form {
+    min-width: 100%;
+    max-height: 100%;
+    /* margin: 15px; */
+    padding: 15px;
+    display: grid;
+    grid-template-rows: 100px 150px 220px;
+    border: 1px solid lightgrey;
+    border-bottom: 0px solid transparent !important;
+}
+
+.edit-form .edit-section1 {
+    min-width: 100%;
+    margin: 2px;
+    display: flex;
+    flex-flow: row nowrap;
+    /* border: 1px solid black; */
+}
+
+.edit-form .edit-section1 .group-section1:first-child {
+    display: flex;
+    flex-flow: column wrap;
+    /* grid-template-rows: 1fr 1fr; */
+}
+
+.edit-form .edit-section1 .group-section1:nth-child(2) {
+    display: flex;
+    justify-content: space-between;
+    align-items: right;
+    /* border: 1px solid crimson; */
+}
+
+.edit-form .edit-section1 .group-section1:first-child label {
+    max-width: 100%;
+    font-weight: bold;
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    /* background-color: violet; */
+}
+.edit-form .edit-section1 .group-section1:first-child input[type="text"] {
+    min-width: 100%;
+    max-height: 50%;
+    font-size: 50px;
+    /* background-color: violet; */
+}
+
+.edit-form .edit-section1 .group-section1:nth-child(2) label {
+    max-width: 50%;
+    font-weight: bold;
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    /* background-color: violet; */
+}
+.edit-form .edit-section1 .group-section1:nth-child(2) input[type="file"] {
+    max-width: 100%;
+    height: auto;
+    /* background-color: violet; */
+}
+
+.edit-form .edit-section1 .group-section1 .form-img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border: 1px solid lightgrey;
+}
+
+.edit-form .edit-section2 {
+    min-width: 100%;
+    margin: 2px;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* border: 1px solid brown; */
+}
+.edit-form .edit-section2 label, input, select, button {
+    max-width: 100%;
+    height: 40px;
+    margin: 10px;
+}
+
+.edit-form .edit-section3 {
+    min-width: 100%;
+    margin: 2px;
+    /* display: flex;
+    flex-flow: row nowrap; */
+    /* border: 1px solid black; */
+}
+.edit-form .edit-section3 .group-section3 {
+    padding: 15px;
+    display: grid;
+    grid-template-rows: 1fr 4fr;
+}
+.edit-form .edit-section3 .group-section3 textarea{
+    min-width: 100%;
+    height: auto;
+}
+
+.edit-btn-group {
+    min-width: 100%;
+    margin: 2px;
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    /* border: 1px solid rebeccapurple; */
+}
+
+.edit-btn-group .edit-save {
+    width: auto;
+    margin: 0px 10px 0px 0px;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}

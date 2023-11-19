@@ -1,0 +1,347 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+
+<style>
+    .hide-name {
+        position: relative;
+        visibility: hidden;
+    }
+
+    .hide-name::after {
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        font-weight: bold;
+        content: "Ventas";
+        position: absolute;
+        visibility: visible;
+        left: 10%;
+        top: -5px;
+    }
+
+    /* .hide-inv {
+        position: relative;
+        visibility: visible;
+    } */
+
+    .hide-arrow {
+        position: relative;
+        visibility: visible;
+        left: 15px;
+        top: -5px;
+    }
+</style>
+
+<a href="{{ url_for('sales') }}" class="edit-back">Ventas </a><a
+    style="font-size: 25px; user-select: none; color: lightgrey;">/ Venta No.{{venta[0]}}</a>
+
+<div class="edit-main-container">
+    <div class="edit-btn-group">
+        <button class="edit-save btn btn-success" id="guardar-btn">
+            Guardar
+        </button>
+        <button class="edit-save btn btn-primary" id="confirmar-btn" onclick="generarFactura()">
+            Confirmar
+        </button>
+    </div>
+    <form class="edit-form salesform" id="primer">
+
+        <div class="edit-section1">
+            <div class="group-section1 input-group">
+                <input type="text" class="form-control" value="Venta #{{ venta[0] }}" disabled>
+                <input type="hidden" class="form-control" name="no_factura" id="no_factura" value="{{ venta[0] }}">
+            </div>
+        </div>
+
+        <div class="edit-section2">
+            <div class="input-group">
+                <label for="nombre">Cliente:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ venta[1] }}">
+            </div>
+
+            <div class="input-group">
+                <label for="nit">Nit:</label>
+                <input type="text" class="form-control" id="nit" name="nit" value="{{ venta[2] }}">
+            </div>
+
+            <div class="input-group">
+                <label for="direccion">Direccion:</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ venta[3] }}">
+            </div>
+
+            <div class="input-group">
+                <label for="fecha_emision">Fecha de venta:</label>
+                <input type="text" class="form-control" id="fecha_emision" name="fecha_emision" value="{{ venta[4] }}"
+                    disabled>
+            </div>
+
+            <div class="input-group">
+                <select class="form-control" name="producto_id" id="producto_id" required>
+                    <option value="" disabled selected>Seleccione un producto</option>
+                    {% for producto in productos %}
+                    <option value="{{ producto[0] }}" data-precio="{{ producto[5] }}" data-max="{{ producto[6] }}">{{
+                        producto[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <button id="agregar_producto" name="agregar_producto" class="edit-save btn btn-success"><i
+                        class="fas fa-plus" style="color: white;"></i></button>
+            </div>
+
+        </div>
+
+        <div class="edit-section3">
+
+        </div>
+    </form>
+</div>
+
+<div class="container-sales-edit">
+    <div class="table-responsive">
+        <form action="{{ url_for('actualizar_cantidades') }}" method="POST" id="segundo">
+            <table class="table table-striped" id="detalle_factura">
+                <thead class="content-head">
+                    <tr>
+                        <th></th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody id="detalle_factura_body">
+                    {% for tabla in tablas %}
+                    <tr>
+                        <td><input type="checkbox" value="{{ tabla[5] }}" name="items" checked hidden></td>
+                        <td class="multiple-content-cell"><a>{{ tabla[6] }}</a></td>
+                        <td class="multiple-content-cell"><input type="number" value="{{ tabla[7] }}" min="1"
+                                max="{{ tabla[9] }}" name="cantidad_{{ tabla[5] }}"></td>
+                        <td class="multiple-content-cell"><a name="precio_{{ tabla[5] }}">Q{{ tabla[8] }}</a></td>
+                        <td class="multiple-content-cell">
+                            <a name="subtotal_{{ tabla[5] }}">Q{{ tabla[10] }}</a>
+                            <input type="hidden" name="subtotal_{{ tabla[5] }}" value="{{ tabla[10] }}">
+                        </td>
+                        <td class="multiple-content-cell">
+                            <form action="{{ url_for('eliminar_venta', ID_DETALLE=tabla[5]) }}" method="POST">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <img src="{{ url_for('static', filename='img/delete_card.png') }}" alt="Eliminar"
+                                        width="25" height="25">
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+            <a style="position: relative; left: 65%;">Total: Q0.00</a>
+        </form>
+    </div>
+</div>
+
+<script>
+    function generarFactura() {
+        // Obtener datos del formulario
+        const noFactura = document.getElementById('no_factura').value;
+        const cliente = document.getElementById('nombre').value;
+        const nit = document.getElementById('nit').value;
+        const direccion = document.getElementById('direccion').value;
+        const fechaEmision = document.getElementById('fecha_emision').value;
+
+        // Recopilar datos de la tabla de detalles (supongamos que hay una tabla con ID 'detalle_factura_body')
+        const detallesFactura = [];
+        const tablaDetalles = document.getElementById('detalle_factura_body').getElementsByTagName('tr');
+        for (let i = 0; i < tablaDetalles.length; i++) {
+            const detalle = tablaDetalles[i];
+            const producto = detalle.cells[1].innerText; // Obtener nombre del producto
+            const cantidad = parseInt(detalle.cells[2].getElementsByTagName('input')[0].value, 10); // Convertir a entero
+            const precioUnitario = parseFloat(detalle.cells[3].innerText.substring(1)); // Convertir a flotante
+            const subtotal = parseFloat(detalle.cells[4].getElementsByTagName('input')[0].value); // Convertir a flotante
+            detallesFactura.push({ producto, cantidad, precio_unitario: precioUnitario, subtotal });
+        }
+
+        // Construir el objeto con los datos a enviar al servidor
+        const datosFactura = {
+            no_factura: noFactura,
+            cliente: cliente,
+            nit: nit,
+            direccion: direccion,
+            fecha_emision: fechaEmision,
+            detalles: detallesFactura // Agregar los detalles de la factura
+        };
+
+        // Enviar los datos al servidor utilizando fetch
+        fetch('/generar_factura', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(datosFactura),
+        })
+            .then(response => {
+                // Manejar la respuesta del servidor, por ejemplo, descargar el PDF
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Error en la generación de la factura');
+            })
+            .then(blob => {
+                // Crear un enlace para descargar el PDF
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'factura.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const cantidadInputs = document.querySelectorAll('input[name^="cantidad_"]');
+
+        cantidadInputs.forEach(function (cantidadInput) {
+            cantidadInput.addEventListener('input', updateSubtotal);
+        });
+
+        function updateSubtotal(event) {
+            const cantidadInput = event.target;
+            const tablaRow = cantidadInput.closest('tr');
+
+            // Extract the cantidad, precio, and subtotal elements
+            const cantidad = parseInt(cantidadInput.value);
+            const itemId = cantidadInput.name.split('_')[1];  // Extract item ID from the name
+            const precioElement = tablaRow.querySelector(`.multiple-content-cell [name="precio_${itemId}"]`);
+            const precio = parseFloat(precioElement.textContent.substring(1)); // Assuming it starts with 'Q'
+
+            // Update the subtotal in the table
+            const subtotalCell = tablaRow.querySelector(`.multiple-content-cell [name="subtotal_${itemId}"]`);
+            const subtotalInput = tablaRow.querySelector(`.multiple-content-cell input[name="subtotal_${itemId}"]`);
+            const subtotal = cantidad * precio;
+
+            // Update the displayed subtotal
+            subtotalCell.innerHTML = `Q${subtotal}`;
+
+            // Update the hidden input field for subtotal
+            subtotalInput.value = subtotal;
+        }
+    });
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectProducto = document.getElementById("producto_id");
+        const detalleFacturaBody = document.getElementById("detalle_factura_body");
+        const agregarProductoButton = document.getElementById("agregar_producto");
+        const guardarFacturaButton = document.getElementById("guardar-btn");
+        const facturaItems = [];
+
+        agregarProductoButton.addEventListener("click", function () {
+            const selectedOption = selectProducto.options[selectProducto.selectedIndex];
+            if (selectedOption.value) {
+                const productoId = selectedOption.value;
+                const productoNombre = selectedOption.textContent;
+                const cantidad = 1;
+                const no_factura = parseInt(document.getElementById("no_factura").value);
+                const precio = parseFloat(selectedOption.getAttribute("data-precio"));
+                const max = parseFloat(selectedOption.getAttribute("data-max"));
+                const subtotal = cantidad * precio;
+
+                const producto = {
+                    id_producto: productoId,
+                    precio: precio,
+                    cantidad: cantidad,
+                    subtotal: subtotal,
+                    no_factura: no_factura
+                };
+                facturaItems.push(producto);
+
+                const newRow = detalleFacturaBody.insertRow();
+                newRow.innerHTML = `
+             <input type="hidden" value="${productoId}" name="id_producto" id="id_producto">
+             <td><input type="checkbox" checked hidden></td>
+             <td class="multiple-content-cell"><a>${productoNombre}</a></td>
+             <td class="multiple-content-cell"><input type="number" value="${cantidad}" min="1" max="${max}" name="cantidad" class="cantidad"></td>
+             <td class="multiple-content-cell"><a name="precio">${precio}</a></td>
+             <td class="multiple-content-cell"><a name="subtotal">Q${subtotal}</a></td>
+             <td class="multiple-content-cell"><button class="eliminar-producto edit-save btn btn-danger"><i class="fas fa-minus" style="color: white;"></i></button></td>
+             `;
+
+                selectProducto.value = "";
+
+                const cantidadInput = newRow.querySelector(".cantidad");
+                cantidadInput.addEventListener("change", function () {
+                    const newCantidad = parseInt(cantidadInput.value);
+                    const index = facturaItems.findIndex(item => item.id_producto === productoId);
+                    if (index !== -1) {
+                        facturaItems[index].cantidad = newCantidad;
+                    }
+                });
+
+                cantidadInput.addEventListener('input', Subtotal);
+                function Subtotal() {
+                    const newCantidad = parseInt(cantidadInput.value);
+                    producto.cantidad = newCantidad;
+                    const celda = newRow.querySelector('[name="subtotal"]');
+                    const subtotal = newCantidad * precio;
+                    producto.subtotal = subtotal
+                    celda.innerHTML = `Q${subtotal}`;
+                }
+            }
+            const eliminarBotones = document.querySelectorAll(".eliminar-producto");
+            eliminarBotones.forEach(function (boton) {
+                boton.addEventListener("click", function () {
+                    const fila = boton.closest("tr");
+                    fila.remove();
+                    const productoId = fila.querySelector("input[name='id_producto']").value;
+                    const index = facturaItems.findIndex(item => item.id_producto === productoId);
+                    if (index !== -1) {
+                        facturaItems.splice(index, 1);
+                    }
+                });
+            });
+        });
+
+        guardarFacturaButton.addEventListener("click", function () {
+            var nombre = $("#nombre").val().trim();
+            var nit = $("#nit").val().trim();
+            var direccion = $("#direccion").val().trim();
+            var fecha_emision = $("#fecha_emision").val().trim();
+
+            if (nombre === "" || nit === "" || direccion === "" || fecha_emision === "") {
+                alert("Por favor complete todos los campos obligatorios.");
+                return;
+            }
+
+            var dataToSend = {
+                facturaItems: facturaItems,
+                nombre: nombre,
+                nit: nit,
+                direccion: direccion,
+                fecha_emision: fecha_emision
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('editSales', NO_FACTURA=venta[0]) }}",
+                data: JSON.stringify(dataToSend),
+                processData: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    alert("Los cambios se han guardado correctamente.");
+                    window.location.reload();
+                },
+                error: function (error) {
+                    alert("Verifique que los datos de los campos sean del tipo correcto y vuelva a intentar.")
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

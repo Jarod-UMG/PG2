@@ -1,0 +1,85 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+<style>
+    .hide-name {
+        position: relative;
+        visibility: hidden;
+    }
+
+    .hide-name::after {
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        font-weight: bold;
+        content: "Inventario";
+        position: absolute;
+        visibility: visible;
+        left: 10%;
+        top: -5px;
+    }
+
+    .hide-inv {
+        position: relative;
+        visibility: visible;
+    }
+
+    .hide-arrow {
+        position: relative;
+        visibility: visible;
+        left: 15px;
+        top: -5px;
+    }
+</style>
+
+<a href="{{ url_for('brands') }}" class="edit-back">Marcas </a><a
+    style="font-size: 25px; user-select: none; color: lightgrey;">/ [{{ marca[0] }}] {{ marca[1] }}</a>
+
+<div class="edit-main-container">
+    <div class="edit-btn-group">
+        <button type="submit" class="edit-save btn btn-success" id="guardar-btn">
+            Guardar
+        </button>
+    </div>
+    <form class="edit-form" action="{{ url_for('editBrands', ID_MARCA=marca[0]) }}" method="POST"
+        enctype="multipart/form-data">
+
+        <div class="edit-section1">
+            <div class="group-section1 input-group">
+                <label for="nombre_marca">Nombre</label>
+                <input type="text" class="form-control" id="nombre_marca" name="nombre_marca" value="{{ marca[1] }}">
+            </div>
+        </div>
+        <div class="edit-section2"></div>
+        <div class="edit-section3"></div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#guardar-btn").click(function () {
+            // Recolectar los datos del formulario
+            var formData = new FormData($(".edit-form")[0]);
+
+            // Realizar una solicitud AJAX para enviar los datos al servidor
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('editBrands', ID_MARCA=marca[0]) }}",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    // Manejar la respuesta del servidor (puede ser redirigir o mostrar un mensaje de éxito)
+                    alert("Los cambios se han guardado correctamente.");
+                    window.location.reload();
+                },
+                error: function (error) {
+                    // Manejar los errores si la solicitud falla
+                    alert("Ha ocurrido un error al guardar los cambios.");
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

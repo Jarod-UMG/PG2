@@ -1,0 +1,22 @@
+{% block content %}
+
+<div class="contact-main-container">
+    {% for contacto in contactos %}
+    <a class="contact-container" href="{{ url_for('editContacts', ID_CONTACTO=contacto[0]) }}">
+        <div class="contact-img-container"><img src="{{ url_for('static', filename=contacto[6]) }}" alt="imagen"
+                class="contact-img"></div>
+        <div class="contact-info-container">
+            <p class="contact-name">{{ contacto[1] }}</p>
+            <p class="contact-address">{{ contacto[3] }}</p>
+            <p class="contact-phone">{{ contacto[4] }}</p>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<div class="pagination">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+
+{% endblock %}

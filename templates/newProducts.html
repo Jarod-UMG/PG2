@@ -1,0 +1,152 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+<style>
+    .hide-name {
+        position: relative;
+        visibility: hidden;
+    }
+
+    .hide-name::after {
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        font-weight: bold;
+        content: "Inventario";
+        position: absolute;
+        visibility: visible;
+        left: 10%;
+        top: -5px;
+    }
+
+    .hide-inv {
+        position: relative;
+        visibility: visible;
+    }
+
+    .hide-arrow {
+        position: relative;
+        visibility: visible;
+        left: 15px;
+        top: -5px;
+    }
+</style>
+
+<a href="{{ url_for('products') }}" class="edit-back">Productos </a><a
+    style="font-size: 25px; user-select: none; color: lightgrey;">/ Nuevo</a>
+
+<div class="edit-main-container">
+    <div class="edit-btn-group">
+        <button type="submit" class="edit-save btn btn-success" id="guardar-btn">
+            Guardar
+        </button>
+    </div>
+    <form class="edit-form" enctype="multipart/form-data">
+
+        <div class="edit-section1">
+            <div class="group-section1 input-group">
+                <label for="nombre_producto">Nombre:</label>
+                <input type="text" class="form-control" id="nombre_producto" name="nombre_producto" required>
+            </div>
+
+            <div class="group-section1 input-group">
+                <div class="group-section1-1">
+                    <label for="imagen">Imagen:</label>
+                    <input type="file" class="form-control" id="imagen" name="imagen">
+                </div>
+                <img id="preview" alt="No_imagen" class="form-img">
+            </div>
+        </div>
+
+        <div class="edit-section2">
+
+            <div class="input-group">
+                <label for="categoria">Categoria:</label>
+                <select class="form-control" id="id_categoria" name="id_categoria" required>
+                    {% for categoriasproducto in categoriasproductos %}
+                    <option value="{{ categoriasproducto[0] }}">
+                        {{ categoriasproducto[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="marca">Marca:</label>
+                <select class="form-control" id="id_marca" name="id_marca" required>
+                    {% for marcasproducto in marcasproductos %}
+                    <option value="{{ marcasproducto[0] }}">
+                        {{ marcasproducto[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="precio">Precio:</label>
+                <input type="text" class="form-control" id="precio" name="precio" required>
+            </div>
+
+            <div class="input-group">
+                <label for="existencia">Existencia:</label>
+                <input type="number" class="form-control" id="existencia" name="existencia" min="0" required>
+            </div>
+
+            <div class="input-group">
+                <label for="coste">coste:</label>
+                <input type="text" class="form-control" id="coste" name="coste" required>
+            </div>
+
+        </div>
+
+        <div class="edit-section3">
+            <div class="group-section3 input-group">
+                <label for="descripcion">Descripcion:</label>
+                <textarea type="text" class="form-control" id="descripcion" name="descripcion" required></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#guardar-btn").click(function () {
+            event.preventDefault(); // Evita el envío automático del formulario
+
+            // Validar que los campos requeridos no estén vacíos
+            var nombre = $("#nombre_producto").val().trim();
+            var categoria = $("#id_categoria").val().trim();
+            var marca = $("#id_marca").val().trim();
+            var precio = $("#precio").val().trim();
+            var existencia = $("#existencia").val().trim();
+            var descripcion = $("#descripcion").val().trim();
+            var coste = $("#coste").val().trim();
+
+            if (nombre === "" || categoria === "" || marca === "" || precio === "" || existencia === "" || descripcion === "" || coste === "" || existencia === "") {
+                alert("Por favor complete todos los campos obligatorios.");
+                return;
+            }
+            // Recolectar los datos del formulario
+            var formData = new FormData($(".edit-form")[0]);
+
+            // Realizar una solicitud AJAX para enviar los datos al servidor
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('crear_producto') }}",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    // Manejar la respuesta del servidor (puede ser redirigir o mostrar un mensaje de éxito)
+                    alert("Los cambios se han guardado correctamente.");
+                    window.location.replace("/admin/products");
+                },
+                error: function (error) {
+                    // Manejar los errores si la solicitud falla
+                    alert("Ha ocurrido un error al guardar los cambios. Detalles: " + error.statusText);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

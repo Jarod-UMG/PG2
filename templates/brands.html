@@ -1,0 +1,101 @@
+{% extends 'baseDashboard.html' %}
+
+{% block content %}
+<style>
+    .hide-name {
+        position: relative;
+        visibility: hidden;
+    }
+
+    .hide-name::after {
+        color: white;
+        font-family: Arial;
+        font-size: 30px;
+        content: "Inventario";
+        position: absolute;
+        visibility: visible;
+        left: 10%;
+        top: -5px;
+    }
+
+    .hide-inv {
+        position: relative;
+        visibility: visible;
+    }
+
+    .hide-arrow {
+        position: relative;
+        visibility: visible;
+        left: 15px;
+        top: -5px;
+    }
+</style>
+
+<div class="page-header">
+    <p class="page-name-module">Marcas</p>
+
+    <form id="form-busqueda" class="pages-form">
+        <div class="search-group input-group">
+            <input type="text" class="page-search" id="valor_busqueda" name="valor_busqueda" placeholder="Buscar"
+                autocomplete="off">
+            <button type="button" id="buscar" class="page-search-btn"><i class="fas fa fa-search"></i></button>
+        </div>
+        <div class="select-group">
+            <select class="page-select" id="campo_busqueda" name="campo_busqueda">
+                <option value="nada" selected>Filtros</option>
+                <option class="opt" value="nombre_marca">Nombre</option>
+            </select>
+        </div>
+    </form>
+
+    <a href="{{ url_for('newBrands') }}" class="btn btn-success page-create-btn">Crear</a>
+</div>
+
+<div class="content-container" id="resultado-busqueda">
+    <div class="table-responsive">
+        <table class="table table-striped content-table">
+            <thead class="content-head">
+                <tr>
+                    <th>Marca</th>
+                </tr>
+            </thead>
+            <tbody class="">
+                {% for marca in marcas %}
+                <tr>
+                    <td class="content-cell">
+                        <a href="{{ url_for('editBrands', ID_MARCA=marca[0]) }}" class="content-btn">{{ marca[1] }}</a>
+                        <form action="{{ url_for('eliminar_marca', ID_MARCA=marca[0]) }}" method="POST"
+                            onsubmit="return confirm('¿Estás seguro de que desea eliminar este registro?');">
+                            <button type="submit" class="btn btn-danger btn-sm hide-delete">
+                                <img src="{{ url_for('static', filename='img/delete_card.png') }}" alt="Eliminar"
+                                    width="25" height="25">
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        {{ pagination.info }}
+        {{ pagination.links }}
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#buscar").click(function () {
+            var formData = $("#form-busqueda").serialize();
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('buscar_marcas') }}",
+                data: formData,
+                success: function (response) {
+                    $("#resultado-busqueda").html(response);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

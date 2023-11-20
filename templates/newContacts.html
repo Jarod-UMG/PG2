@@ -122,7 +122,7 @@
                 success: function (response) {
                     // Manejar la respuesta del servidor (puede ser redirigir o mostrar un mensaje de éxito)
                     alert("Los cambios se han guardado correctamente.");
-                    window.location.replace('/admin/contacts');
+                    window.location.reload();
                 },
                 error: function (error) {
                     // Manejar los errores si la solicitud falla

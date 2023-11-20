@@ -32,36 +32,6 @@
         top: -5px;
     }
 
-    .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            width: 210px;
-            min-height: auto;
-            max-height: 210px;
-            overflow: hidden;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            
-        }
-
-        /* Estilo para el input de búsqueda */
-        #searchInput {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-        }
 </style>
 
 <a href="{{ url_for('purchases') }}" class="edit-back">Ordenes de compra </a><a
@@ -85,7 +55,17 @@
         <div class="edit-section2">
             <div class="input-group">
                 <label for="nombre">Proveedor:</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                <div class="dropdownp" onmouseleave="hideDropdown()">
+                    <input type="text" class="form-control" id="nombre" name="nombre" onkeyup="filterDropdown()"
+                        onclick="showDropdown()" onblur="hideDropdown()" placeholder="Buscar proveedor" required autocomplete="off">
+                    <div class="dropdown-content" id="myDropdown">
+                        {% for contacto in contactos %}
+                        <a onclick="selectResult(this)" data-direccion="{{ contacto[3] }}">{{
+                            contacto[1] }}</a>
+                        {% endfor %}
+                        <a id="crearNuevoCliente" style="display: none;" onclick="createNewClient()">Crear</a>
+                    </div>
+                </div>
             </div>
 
             <div class="input-group">
@@ -106,15 +86,6 @@
                         producto[1] }}</option>
                     {% endfor %}
                 </select>
-                <div class="dropdown" onmouseleave="hideDropdown()">
-                    <input type="text" id="searchInput" onkeyup="filterDropdown()" onclick="showDropdown()" onblur="hideDropdown()" placeholder="Buscar en el dropdown" required>
-                    <div class="dropdown-content" id="myDropdown">
-                        {% for producto in productos %}
-                        <a onclick="selectResult(this)" value="{{ producto[0] }}" data-precio="{{ producto[5] }}" data-max="{{ producto[6] }}">{{
-                            producto[1] }}</a>
-                        {% endfor %}
-                    </div>
-                </div>
                 <button id="agregar_producto" name="agregar_producto" class="edit-save btn btn-success"><i
                         class="fas fa-plus" style="color: white;"></i></button>
 
@@ -148,21 +119,31 @@
 </div>
 
 <script>
-        function filterDropdown() {
-            var input, filter, ul, li, a, i;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            ul = document.getElementById("myDropdown");
-            li = ul.getElementsByTagName("a");
-            for (i = 0; i < li.length; i++) {
-                a = li[i];
-                if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    li[i].style.display = "";
-                } else {
-                    li[i].style.display = "none";
-                }
+    function filterDropdown() {
+        var input, filter, ul, li, a, i, resultsFound;
+        input = document.getElementById("nombre");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myDropdown");
+        li = ul.getElementsByTagName("a");
+        resultsFound = false;
+
+        for (i = 0; i < li.length; i++) {
+            a = li[i];
+            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+                resultsFound = true;
+            } else {
+                li[i].style.display = "none";
             }
         }
+
+        var crearNuevoCliente = document.getElementById("crearNuevoCliente");
+        if (!resultsFound) {
+            crearNuevoCliente.style.display = "block";
+        } else {
+            crearNuevoCliente.style.display = "none";
+        }
+    }
 
         function showDropdown() {
             document.getElementById("myDropdown").style.display = "block";
@@ -175,9 +156,19 @@
         }
 
         function selectResult(element) {
-            document.getElementById("searchInput").value = element.innerHTML;
-            hideDropdown();
+            var selectedName = element.innerHTML;
+        var selectedAddress = element.getAttribute("data-direccion");
+
+        document.getElementById("nombre").value = selectedName;
+        document.getElementById("direccion").value = selectedAddress;
+
+        hideDropdown();
         }
+
+        function createNewClient() {
+        // Aquí redirige a la página para crear un nuevo cliente
+        window.location.href = "{{ url_for('newContacts') }}";
+    }
 
     // const fechaactual = new Date().toISOString().split('T')[0];
     const fechaactual = new Date().toLocaleDateString();

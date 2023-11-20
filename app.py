@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, flash, redirect, url_for, Response
+from flask import Flask, jsonify, render_template, request, session, flash, redirect, url_for, Response
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 from flask_paginate import Pagination, get_page_args
@@ -10,6 +10,7 @@ import cx_Oracle
 import os
 import time
 import requests
+import pandas as pd
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'admin'
@@ -140,6 +141,38 @@ def crear_producto():
         return redirect(url_for('newProducts'))
     else:
         return redirect(url_for('login'))
+
+@app.route('/crear_producto_desde_excel', methods=['POST'])
+def crear_producto_desde_excel():
+    archivo_excel = request.files['archivo_excel']
+    
+    if archivo_excel.filename.endswith('.xlsx'):  # Asegurarse de que el archivo sea un archivo Excel
+        df = pd.read_excel(archivo_excel)
+        
+        cursor = connection.cursor()
+        for index, row in df.iterrows():
+            nombre_producto = row['nombre_producto']
+            descripcion = row['descripcion']
+            id_categoria = row['id_categoria']
+            id_marca = row['id_marca']
+            precio = row['precio']
+            existencia = row['existencia']
+            imagen = 'imgbd/no producto.jpg'
+            coste = row['coste']
+            
+            # Aquí va tu lógica de guardado en la base de datos, similar a tu código original
+            # ...
+
+            # Ejemplo de insertar en la base de datos
+            sql = "INSERT INTO productos (nombre_producto, descripcion, id_categoria, id_marca, precio, existencia, imagen, coste) VALUES (:nombre_producto, :descripcion, :id_categoria, :id_marca, :precio, :existencia, :imagen, :coste)"
+            cursor.execute(sql, {'nombre_producto': nombre_producto, 'descripcion': descripcion, 'id_categoria': id_categoria,
+                            'id_marca': id_marca, 'precio': precio, 'existencia': existencia, 'imagen': imagen, 'coste': coste})
+            connection.commit()
+
+        return redirect(request.referrer)
+    
+    else:
+        return 'Por favor, sube un archivo Excel (.xlsx)'
 
 @app.route('/editProducts/<int:ID_PRODUCTO>', methods=['GET', 'POST']) # ruta para editar productos
 def editProducts(ID_PRODUCTO):
@@ -980,9 +1013,14 @@ def newSales():
     venta = cursor1.fetchone()
     cursor1.close()
 
+    cursor2 = connection.cursor()
+    cursor2.execute("SELECT *FROM CONTACTOS WHERE ID_ROL = 1")
+    contactos = cursor2.fetchall()
+    cursor2.close()
+
     if 'id_rol' in session:
         id_rol = session['id_rol']
-        return render_template('newSales.html', productos=productos, venta=venta)
+        return render_template('newSales.html', productos=productos, venta=venta, contactos=contactos)
     else:
         return redirect(url_for('login'))
 
@@ -1048,14 +1086,20 @@ def editSales(NO_FACTURA):
             cursor2.execute("SELECT *FROM PRODUCTOS")
             productos = cursor2.fetchall()
             cursor2.close()
-            connection.close()
+            # connection.close()
+
+            cursor3 = connection.cursor()
+            cursor3.execute("SELECT *FROM CONTACTOS WHERE ID_ROL = 1")
+            contactos = cursor3.fetchall()
+            cursor3.close()
+
 
             if venta is None:
                 flash('venta no encontrada', 'danger')
                 return redirect(url_for('sales'))
             if 'id_rol' in session:
                 id_rol_u = session['id_rol']
-                return render_template('editSales.html', venta=venta, tablas=tablas, productos=productos)
+                return render_template('editSales.html', venta=venta, tablas=tablas, productos=productos, contactos=contactos)
             else:
                 return redirect(url_for('login'))
 
@@ -1216,9 +1260,14 @@ def newPurchases():
     compra = cursor1.fetchone()
     cursor1.close()
 
+    cursor2 = connection.cursor()
+    cursor2.execute("SELECT *FROM CONTACTOS WHERE ID_ROL = 2")
+    contactos = cursor2.fetchall()
+    cursor2.close()
+
     if 'id_rol' in session:
         id_rol = session['id_rol']
-        return render_template('newPurchases.html', productos=productos, compra=compra)
+        return render_template('newPurchases.html', productos=productos, compra=compra, contactos=contactos)
     else:
         return redirect(url_for('login'))
 
@@ -1283,14 +1332,20 @@ def editPurchases(NO_COMPRA):
             cursor2.execute("SELECT *FROM PRODUCTOS")
             productos = cursor2.fetchall()
             cursor2.close()
-            connection.close()
+
+            cursor3 = connection.cursor()
+            cursor3.execute("SELECT *FROM CONTACTOS WHERE ID_ROL = 2")
+            contactos = cursor3.fetchall()
+            cursor3.close()
+            #connection.close()
+
 
             if compra is None:
                 flash('compra no encontrada', 'danger')
                 return redirect(url_for('purchases'))
             if 'id_rol' in session:
                 id_rol_u = session['id_rol']
-                return render_template('editPurchases.html', compra=compra, tablas=tablas, productos=productos)
+                return render_template('editPurchases.html', compra=compra, tablas=tablas, productos=productos, contactos=contactos)
             else:
                 return redirect(url_for('login'))
 
@@ -1416,11 +1471,72 @@ def buscar_compras():
     else:
         return redirect(url_for('login'))
 
+def verificar_existencias(fecha_o, precio_o, subtotal_o):
+    cursor = connection.cursor()
+    cursor1 = connection.cursor()
+    
+    # Consultar productos con existencias igual o menores a 10
+    cursor.execute("SELECT ID_PRODUCTO, EXISTENCIA FROM PRODUCTOS WHERE EXISTENCIA <= 10")
+    productos_existencias_bajas = cursor.fetchall()
+
+    if productos_existencias_bajas:
+        # Generar órdenes de compra para productos con existencias bajas
+        for producto in productos_existencias_bajas:
+            id_producto, existencias = producto
+            # Crear la orden de compra automáticamente
+            # Puedes adaptar esta lógica según la estructura de tu base de datos
+            # Aquí se asume una estructura sencilla para la tabla ORDENES_COMPRA
+            fecha_pedido = fecha_o
+            nombre = "Proveedor Ejemplo"
+            direccion = "Dirección de Ejemplo"
+            precio = precio_o
+            subtotal = subtotal_o
+            cantidad_a_pedir = 20 - existencias  # Ejemplo: pedir hasta alcanzar 20 existencias en total
+
+            nombre_rol_u = session['nombre']
+
+            sql = "INSERT INTO COMPRAS (FECHA_PEDIDO, PROVEEDOR, DIRECCION, COMPRADOR) VALUES (:fecha_pedido, :proveedor, :direccion, :comprador)"
+
+            cursor = connection.cursor()
+            cursor.execute(sql, {'fecha_pedido': fecha_pedido, 'proveedor': nombre, 'direccion': direccion, 'comprador': nombre_rol_u})
+            connection.commit()
+
+            cursor.execute("SELECT COMPRAS_SEQ.CURRVAL FROM DUAL")
+            no_compra = cursor.fetchone()[0]
+
+            cursor1 = connection.cursor()
+            sql_detalle ="INSERT INTO DETALLES_COMPRA (NO_COMPRA, ID_PRODUCTO, CANTIDAD, PRECIO, SUBTOTAL) VALUES (:no_compra, :id_producto, :cantidad, :precio, :subtotal)"
+            cursor1.execute(sql_detalle, {'no_compra': no_compra, 'id_producto': id_producto, 'cantidad': cantidad_a_pedir, 'precio': precio, 'subtotal': subtotal})
+            connection.commit()
+
+
+    cursor.close()
+    cursor1.close()
+
+def verificar_existencia_producto(producto, cantidad):
+
+    # Preparar la consulta para obtener la existencia del producto
+    query = "SELECT EXISTENCIA FROM PRODUCTOS WHERE NOMBRE_PRODUCTO = :producto"
+
+    # Crear un cursor y ejecutar la consulta con el nombre del producto proporcionado
+    cursor = connection.cursor()
+    cursor.execute(query, {'producto': producto})
+    result = cursor.fetchone()  # Obtiene el resultado de la consulta
+
+    # Verificar si se encontró el producto y si hay suficiente existencia
+    if result:
+        existencia_disponible = result[0]
+        
+
+        if existencia_disponible >= cantidad:
+            return True  # Hay suficiente existencia del producto
+    return False  # No hay suficiente existencia del producto
 
 @app.route('/generar_factura', methods=['POST'])
 def generar_factura():
     
     datos_factura = request.json
+    
     detalles_factura = datos_factura.get('detalles', [])
 
     nombre_cliente = datos_factura.get('cliente', 'Nombre no proporcionado')
@@ -1440,7 +1556,6 @@ def generar_factura():
     p.setFont("Helvetica", 10)
     p.drawString(10, height - 20, "Ferretería \"La esquina\"")
     p.drawString(10, height - 30, "3a Calle Zona 1, San Lucas Sacatepéquez")
-    p.drawString(10, height - 40, "Teléfono: ")
 
     p.line(10, height - 60, width - 10, height - 60)
     p.line(10, height - 105, width - 10, height - 105)
@@ -1480,6 +1595,10 @@ def generar_factura():
         precio_unitario = detalle.get('precio_unitario', 0)
         subtotal = detalle.get('subtotal', 0)
 
+        if not verificar_existencia_producto(producto, cantidad):
+            # Si el producto no tiene suficiente existencia, devuelve un mensaje de error o realiza alguna acción
+            return jsonify({'error': f'Producto "{producto}" no disponible en la cantidad requerida'})
+
         # Mostrar los detalles del producto en el PDF
         p.drawString(24, y_position, f"{cantidad}")
         p.drawString(120, y_position, f"{producto}")
@@ -1505,7 +1624,9 @@ def generar_factura():
     total_venta = total_iva + subtotal1
     p.drawString(300, height - 370, f"Total:")
     p.drawString(350, height - 370, f"Q{total_venta:.2f}")
-    
+
+    verificar_existencias(fecha, precio_unitario, subtotal)
+
  # Guardar el PDF
     p.showPage()
     p.save()
@@ -1515,30 +1636,7 @@ def generar_factura():
     response = Response(buffer)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'attachment; filename=Factura.pdf'
-    return response
-
-@app.route('/enviar_factura', methods=['POST'])
-def enviar_factura():
-    # Genera la factura como lo hacías anteriormente
-    factura_pdf = generar_factura()
-
-    # Simula el envío a través de una API (cambiar por la URL y datos según la API real)
-    url_api_simulada = 'https://ejemplo.com/api/enviar_factura'
-    datos_factura = {
-        'archivo': factura_pdf,  # Aquí envías el PDF generado
-        'cliente': 'Cliente de ejemplo',
-        'monto': 100.0
-        # Agrega otros datos necesarios para el envío simulado
-    }
-
-    # Simula la solicitud POST a la API
-    response = requests.post(url_api_simulada, json=datos_factura)
-
-    if response.status_code == 200:
-        return "Factura enviada exitosamente"
-    else:
-        return "Error al enviar la factura"
-
+    return response  
 
 @app.route('/generar_compra', methods=['POST'])
 def generar_compra():
@@ -1554,27 +1652,38 @@ def generar_compra():
     p = canvas.Canvas(buffer)
 
     # Configurar el tamaño de la página
-    width, height = 400, 400
+    width, height = 400, 450
     p.setPageSize((width, height))
 
     # Agregar encabezado
-    p.setFont("Helvetica", 12)
-    p.drawString(10, height - 20, "Ferretería \"La esquina\"")
+    p.setFont("Helvetica", 10)
+    p.drawString(10, height - 30, "Orden de Compra No. " + no_factura)
+    p.drawString(10, height - 40, "Fecha: " + fecha)
+
+    p.line(10, height - 60, width - 10, height - 60)
+    p.line(10, height - 105, width - 10, height - 105)
+    p.line(10, height - 60, 10, height - 105)
+    p.line(width - 10, height - 105, width - 10, height - 60)
+
         # Agregar una imagen al recibo (ajusta la ruta de la imagen)
-    # imagen_path = 'static/img/logo_recibo.jpg'
-    # p.drawImage(imagen_path, 350, 350, 50, 50)
+    imagen_path = 'static/img/Logo.jpg'
+    p.drawImage(imagen_path, 300, 395, 80, 50)
 
     # Agregar información del negocio
     p.setFont("Helvetica", 10)
-    p.drawString(10, height - 80, "Proveedor: " + nombre_proveedor)
-    p.drawString(250, height - 90, "Dirección: " + direccion_cliente)
-    p.drawString(250, height - 80, "Fecha: " + fecha)
-    p.drawString(250, height - 70, "Orden de Compra No. " + no_factura)
+    p.drawString(12, height - 70, "Proveedor: " + nombre_proveedor)
+    p.drawString(12, height - 80, "Dirección: " + direccion_cliente)
 
-    # Agregar línea separadora
-    p.line(10, height - 100, width - 10, height - 100)
+    p.drawString(250, height - 70, "Ferretería \"La esquina\"")
+    p.drawString(250, height - 80, "3a Calle Zona 1, San Lucas Sacatepéquez")
 
-    p.drawString(10, height - 120, "Cantidad")
+   # Agregar línea separadora
+    p.line(10, height - 110, width - 10, height - 110)
+    p.line(10, height - 325, 10, height - 110)
+    p.line(width - 10, height - 110, width - 10, height - 325)
+    p.line(10, height - 122, width - 10, height - 122)
+
+    p.drawString(12, height - 120, "Cantidad")
     p.drawString(120, height - 120, "Concepto")
     p.drawString(250, height - 120, "Precio")
     p.drawString(350, height - 120, "Total")

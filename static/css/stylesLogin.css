@@ -2,9 +2,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 75vh;
+    height: 55vh;
     background-color: #E8F7EA;
-    width: 65% !important; /* Añade !important */
+    width: 35% !important; /* Añade !important */
     margin: 0 auto;
 }
 

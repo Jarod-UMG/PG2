@@ -20,7 +20,7 @@
         <div class="login-logo">
             <img src="{{ url_for('static', filename='img/login.png') }}" alt="Logo de la Tienda">
         </div>
-        <h2 class="login-title">Bienvenido de nuevo</h2>
+        <h2 class="login-title saludo-container"><h3 id="saludo"></h3>Bienvenido de nuevo <br></h2>
         <form method="POST" id="login-form">
             <div class="form-group">
                 <input type="text" class="form-control" name="correo" id="correo" placeholder="Correo electrónico"
@@ -32,13 +32,9 @@
             </div>
             <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
         </form>
-        <div class="text-center mt-3">
+        <!-- <div class="text-center mt-3">
             <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
-        </div>
+        </div> -->
     </div>
 </div>
-{% endblock %}
-
-{% block footer %}
-<p>&copy; 2023 Di Socks GT. Todos los derechos reservados.</p>
 {% endblock %}

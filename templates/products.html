@@ -51,6 +51,12 @@
     </form>
 
     <a href="{{ url_for('newProducts') }}" class="btn btn-success page-create-btn">Crear</a>
+
+    <form action="/crear_producto_desde_excel" method="post" enctype="multipart/form-data">
+        <input type="file" name="archivo_excel" accept=".xlsx">
+        <input class="btn btn-success page-create-btn" type="submit" value="Subir archivo Excel">
+    </form>
+    
 </div>
 
 <div class="products-box" id="resultado-busqueda">

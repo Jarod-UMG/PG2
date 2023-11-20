@@ -32,29 +32,6 @@
         top: -5px;
     }
 
-    .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            width: 210px;
-            min-height: auto;
-            max-height: 210px;
-            overflow: hidden;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            
-        }
 </style>
 
 <a href="{{ url_for('sales') }}" class="edit-back">Ventas </a><a
@@ -77,14 +54,16 @@
         <div class="edit-section2">
             <div class="input-group">
                 <label for="nombre">Cliente:</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                <!-- <input type="text" class="form-control" id="nombre" name="nombre" required> -->
                 <div class="dropdown" onmouseleave="hideDropdown()">
-                    <input type="text" id="searchInput" onkeyup="filterDropdown()" onclick="showDropdown()" onblur="hideDropdown()" placeholder="Buscar cliente" required>
+                    <input type="text" class="form-control" id="nombre" name="nombre" onkeyup="filterDropdown()"
+                        onclick="showDropdown()" onblur="hideDropdown()" placeholder="Buscar cliente" required autocomplete="off">
                     <div class="dropdown-content" id="myDropdown">
-                        {% for producto in productos %}
-                        <a onclick="selectResult(this)" value="{{ producto[0] }}" data-precio="{{ producto[5] }}" data-max="{{ producto[6] }}">{{
-                            producto[1] }}</a>
+                        {% for contacto in contactos %}
+                        <a onclick="selectResult(this)" data-direccion="{{ contacto[3] }}" data-nit="{{ contacto[5] }}">{{
+                            contacto[1] }}</a>
                         {% endfor %}
+                        <a id="crearNuevoCliente" style="display: none;" onclick="createNewClient()">Crear</a>
                     </div>
                 </div>
             </div>
@@ -147,36 +126,58 @@
 </div>
 
 <script>
-            function filterDropdown() {
-            var input, filter, ul, li, a, i;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            ul = document.getElementById("myDropdown");
-            li = ul.getElementsByTagName("a");
-            for (i = 0; i < li.length; i++) {
-                a = li[i];
-                if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    li[i].style.display = "";
-                } else {
-                    li[i].style.display = "none";
-                }
+    function filterDropdown() {
+        var input, filter, ul, li, a, i, resultsFound;
+        input = document.getElementById("nombre");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myDropdown");
+        li = ul.getElementsByTagName("a");
+        resultsFound = false;
+
+        for (i = 0; i < li.length; i++) {
+            a = li[i];
+            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+                resultsFound = true;
+            } else {
+                li[i].style.display = "none";
             }
         }
 
-        function showDropdown() {
-            document.getElementById("myDropdown").style.display = "block";
+        var crearNuevoCliente = document.getElementById("crearNuevoCliente");
+        if (!resultsFound) {
+            crearNuevoCliente.style.display = "block";
+        } else {
+            crearNuevoCliente.style.display = "none";
         }
+    }
 
-        function hideDropdown() {
-            setTimeout(function() {
-                document.getElementById("myDropdown").style.display = "none";
-            }, 200); // Retraso para asegurar que no se cierre antes de hacer clic en el dropdown
-        }
+    function showDropdown() {
+        document.getElementById("myDropdown").style.display = "block";
+    }
 
-        function selectResult(element) {
-            document.getElementById("searchInput").value = element.innerHTML;
-            hideDropdown();
-        }
+    function hideDropdown() {
+        setTimeout(function () {
+            document.getElementById("myDropdown").style.display = "none";
+        }, 200); // Retraso para asegurar que no se cierre antes de hacer clic en el dropdown
+    }
+
+    function selectResult(element) {
+        var selectedName = element.innerHTML;
+        var selectedNit = element.getAttribute("data-nit");
+        var selectedAddress = element.getAttribute("data-direccion");
+
+        document.getElementById("nombre").value = selectedName;
+        document.getElementById("nit").value = selectedNit;
+        document.getElementById("direccion").value = selectedAddress;
+
+        hideDropdown();
+    }
+
+    function createNewClient() {
+        // Aquí redirige a la página para crear un nuevo cliente
+        window.location.href = "{{ url_for('newContacts') }}";
+    }
 
     // const fechaactual = new Date().toISOString().split('T')[0];
     const fechaactual = new Date().toLocaleDateString();

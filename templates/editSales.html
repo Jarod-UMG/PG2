@@ -57,7 +57,18 @@
         <div class="edit-section2">
             <div class="input-group">
                 <label for="nombre">Cliente:</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ venta[1] }}">
+                <!-- <input type="text" class="form-control" id="nombre" name="nombre" value="{{ venta[1] }}"> -->
+                <div class="dropdown" onmouseleave="hideDropdown()">
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ venta[1] }}" onkeyup="filterDropdown()"
+                        onclick="showDropdown()" onblur="hideDropdown()" placeholder="Buscar cliente" required autocomplete="off">
+                    <div class="dropdown-content" id="myDropdown">
+                        {% for contacto in contactos %}
+                        <a onclick="selectResult(this)" data-direccion="{{ contacto[3] }}" data-nit="{{ contacto[5] }}">{{
+                            contacto[1] }}</a>
+                        {% endfor %}
+                        <a id="crearNuevoCliente" style="display: none;" onclick="createNewClient()">Crear</a>
+                    </div>
+                </div>
             </div>
 
             <div class="input-group">
@@ -142,6 +153,59 @@
 </div>
 
 <script>
+   function filterDropdown() {
+        var input, filter, ul, li, a, i, resultsFound;
+        input = document.getElementById("nombre");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myDropdown");
+        li = ul.getElementsByTagName("a");
+        resultsFound = false;
+
+        for (i = 0; i < li.length; i++) {
+            a = li[i];
+            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+                resultsFound = true;
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+
+        var crearNuevoCliente = document.getElementById("crearNuevoCliente");
+        if (!resultsFound) {
+            crearNuevoCliente.style.display = "block";
+        } else {
+            crearNuevoCliente.style.display = "none";
+        }
+    }
+
+    function showDropdown() {
+        document.getElementById("myDropdown").style.display = "block";
+    }
+
+    function hideDropdown() {
+        setTimeout(function () {
+            document.getElementById("myDropdown").style.display = "none";
+        }, 200); // Retraso para asegurar que no se cierre antes de hacer clic en el dropdown
+    }
+
+    function selectResult(element) {
+        var selectedName = element.innerHTML;
+        var selectedNit = element.getAttribute("data-nit");
+        var selectedAddress = element.getAttribute("data-direccion");
+
+        document.getElementById("nombre").value = selectedName;
+        document.getElementById("nit").value = selectedNit;
+        document.getElementById("direccion").value = selectedAddress;
+
+        hideDropdown();
+    }
+
+    function createNewClient() {
+        // Aquí redirige a la página para crear un nuevo cliente
+        window.location.href = "{{ url_for('newContacts') }}";
+    }
+
     function generarFactura() {
         // Obtener datos del formulario
         const noFactura = document.getElementById('no_factura').value;
@@ -174,32 +238,43 @@
 
         // Enviar los datos al servidor utilizando fetch
         fetch('/generar_factura', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(datosFactura),
-        })
-            .then(response => {
-                // Manejar la respuesta del servidor, por ejemplo, descargar el PDF
-                if (response.ok) {
-                    return response.blob();
-                }
-                throw new Error('Error en la generación de la factura');
-            })
-            .then(blob => {
-                // Crear un enlace para descargar el PDF
-                const url = window.URL.createObjectURL(new Blob([blob]));
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'factura.pdf';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            })
-            .catch(error => {
-                console.error('Error:', error);
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datosFactura),
+})
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Hubo un problema al generar la factura.');
+        }
+        const contentDisposition = response.headers.get('content-disposition');
+        if (contentDisposition && contentDisposition.indexOf('attachment') !== -1) {
+            return response.blob(); // Si es un archivo, devolver el blob
+            window.location.reload();
+        } else {
+            return response.text().then(text => {
+                throw new Error(text); // Si es un mensaje de error, lanzar una excepción con el mensaje
             });
+        }
+    })
+    .then(blob => {
+        // Si la respuesta es un archivo, descargar el PDF
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'factura.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Eliminar el enlace después de la descarga
+        window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+        console.error('Error:', error.message);
+        alert(error.message); // Mostrar mensaje de error
+    });
+
+
     }
 
 

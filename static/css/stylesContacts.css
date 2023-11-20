@@ -55,7 +55,7 @@
 }
 
 .contact-container .contact-info-container {
-    width: 75%;
+    width: 50%;
     max-height: 100%;
     margin: 2px;
     display: flex;
@@ -65,7 +65,7 @@
 }
 
 .contact-container .contact-info-container p {
-    max-width: 100%;
+    width: 80%;
     max-height: auto;
     margin: 2px;
     font-family: Arial;
